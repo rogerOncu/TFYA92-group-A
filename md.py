@@ -1,4 +1,5 @@
 """Demonstrates molecular dynamics with constant energy."""
+#/home/linle336/anaconda3/lib/python3.8/site-packages/ase/io/formats.py
 
 from ase.lattice.cubic import FaceCenteredCubic
 from ase.md.velocitydistribution import MaxwellBoltzmannDistribution
@@ -8,6 +9,7 @@ from asap3 import Trajectory
 from ase.calculators.kim.kim import KIM
 from read_settings import read_settings_file
 
+
 def calcenergy(a):
     epot = a.get_potential_energy() / len(a)
     ekin = a.get_kinetic_energy() / len(a)
@@ -16,7 +18,7 @@ def calcenergy(a):
     return epot, ekin, t
 
 
-def run_md():
+def run_md(atoms):
 
     # Use KIM for potentials from OpenKIM
     use_kim = True
@@ -35,21 +37,36 @@ def run_md():
         from ase.calculators.lj import LennardJones
         size = 3
 #----------------------------
-
     # Set up a crystal
     # Atomic structure should be read from some cif-file
     # Should this cif-file be an argument of run_md()? I.e. run_md("Atoms.cif")
     # atoms = ase.io.read("Atoms.cif", None)
 
-    atoms = FaceCenteredCubic(directions=[[1, 0, 0], [0, 1, 0], [0, 0, 1]],
-                                  symbol="Ar",
-                                  latticeconstant = 5.256,
-                                  size=(size, size, size),
-                                  pbc=True)
+#    print("TESTING WILLIAM...")
+#    atoms = ase.io.read("nacl.cif", None)
+
+#    mp_properties = read_mp_properties('testing_data_materials.json')
+#    txt_str = mp_properties["cif"][0]
+#    f = open("tmp_cif.cif", "w+")
+#    f.write(txt_str)
+#    f.close()
+
+#    atoms = ase.io.read("tmp_cif.cif", None)
+
+    print(atoms.get_chemical_formula())
+#    print("################TTTTIIIS IS A TEST ")
+
+    #atoms = FaceCenteredCubic(directions=[[1, 0, 0], [0, 1, 0], [0, 0, 1]],
+    #                              symbol="Ar",
+    #                              latticeconstant = 5.256,
+    #                              size=(size, size, size),
+    #                              pbc=True)
+
+
 
     # Describe the interatomic interactions with Lennard Jones
-    if use_kim: # use KIM potential
-        atoms.calc = KIM("ex_model_Ar_P_Morse_07C") #an example potential
+    if use_kim: # use KIM potentialß
+        atoms.calc = KIM("LJ_ElliottAkerson_2015_Universal__MO_959249795837_003") #an example potential
     else: # otherwise, default to asap3 LennardJones
         atoms.calc = LennardJones([18], [0.010323], [3.40], rCut = 6.625, modified = True)
 
