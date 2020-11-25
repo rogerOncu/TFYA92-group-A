@@ -15,22 +15,22 @@ import properties
 def run_md(atoms, id):
     # Read settings
     settings = read_settings_file()
-    
+
     # Use KIM for potentials from OpenKIM
     use_kim = True
-    
+
     # Use Asap for a huge performance increase if it is installed
     use_asap = True
 
     # Set up a crystal
     old_atoms = atoms
-    
+
     # Describe the interatomic interactions with OpenKIM potential
     if use_kim: # use KIM potential
         atoms.calc = KIM("LJ_ElliottAkerson_2015_Universal__MO_959249795837_003")
     else: # otherwise, default to asap3 LennardJones
         atoms.calc = LennardJones([18], [0.010323], [3.40], rCut = 6.625, modified = True)
-    
+
     # Set the momenta corresponding to temperature from settings file
     MaxwellBoltzmannDistribution(atoms, settings['temperature'] * units.kB)
 
@@ -44,8 +44,10 @@ def run_md(atoms, id):
         dyn = Langevin(atoms, settings['time_step'] * units.fs,
             settings['temperature'] * units.kB, settings['friction'])
 
-    traj = Trajectory('ar.traj', 'w', atoms)
-    dyn.attach(traj.write, interval=1000)
+    # Creates trajectory files for every material and puts them in
+    #  a directory called trajectory_files
+    traj = Trajectory("trajectory_files/"+str(atoms.get_chemical_formula(mode='hill', empirical=True))+".traj", 'w', atoms)
+    dyn.attach(traj.write, interval=100)
 
     # Identity number given as func. parameter to keep track of properties
     # Calculation and writing of properties
@@ -61,13 +63,13 @@ def run_md(atoms, id):
         t = ekin / (1.5 * units.kB)
         print('Energy per atom: Epot = %.3feV  Ekin = %.3feV (T=%3.0fK)  '
               'Etot = %.3feV' % (epot, ekin, t, epot + ekin))
-    
+
     # Running the dynamics
     dyn.attach(logger, interval = 10)
     logger()
     dyn.run(settings['max_steps'])
-    
+
     return atoms
-  
+
 if __name__ == "__main__":
     run_md()

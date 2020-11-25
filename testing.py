@@ -7,8 +7,9 @@ from md import run_md
 from properties import initialize_properties_file
 from properties import calc_properties
 from ase.lattice.cubic import FaceCenteredCubic
+from visualization import visualize
 
-NACL = ase.io.read("nacl.cif", None)
+#NACL = ase.io.read("nacl.cif", None)
 
 #x = NACL.get_atomic_numbers()
 #print (x)
